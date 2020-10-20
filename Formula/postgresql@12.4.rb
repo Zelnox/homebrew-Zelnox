@@ -67,9 +67,9 @@ class PostgresqlAT124 < Formula
                                     "libdir=#{lib}",
                                     "pkglibdir=#{lib}/postgresql",
                                     "includedir=#{include}",
-                                    "pkgincludedir=#{include}/postgresql",
-                                    "includedir_server=#{include}/postgresql/server",
-                                    "includedir_internal=#{include}/postgresql/internal"
+                                    "pkgincludedir=#{include}",
+                                    "includedir_server=#{include}/server",
+                                    "includedir_internal=#{include}/internal"
   end
 
   def post_install
