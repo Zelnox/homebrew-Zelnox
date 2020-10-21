@@ -25,7 +25,7 @@ class PostgisAT302 < Formula
   depends_on "geos"
   depends_on "json-c" # for GeoJSON and raster handling
   depends_on "pcre"
-  depends_on "postgresql"
+  depends_on "zelnox/zelnox/postgresql@12.4"
   depends_on "proj"
   depends_on "protobuf-c" # for MVT (map vector tiles) support
   depends_on "sfcgal" # for advanced 2D/3D functions
@@ -36,7 +36,7 @@ class PostgisAT302 < Formula
     args = [
       "--with-projdir=#{Formula["proj"].opt_prefix}",
       "--with-jsondir=#{Formula["json-c"].opt_prefix}",
-      "--with-pgconfig=#{Formula["postgresql"].opt_bin}/pg_config",
+      "--with-pgconfig=#{Formula["postgresql@12.4"].opt_bin}/pg_config",
       "--with-protobufdir=#{Formula["protobuf-c"].opt_bin}",
       # Unfortunately, NLS support causes all kinds of headaches because
       # PostGIS gets all of its compiler flags from the PGXS makefiles. This
@@ -55,10 +55,24 @@ class PostgisAT302 < Formula
     bin.install Dir["stage/**/bin/*"]
     lib.install Dir["stage/**/lib/*"]
     include.install Dir["stage/**/include/*"]
-    (doc/"postgresql/extension").install Dir["stage/**/share/doc/postgresql/extension/*"]
-    (share/"postgresql/extension").install Dir["stage/**/share/postgresql/extension/*"]
+    # (doc/"postgresql/extension").install Dir["stage/**/share/doc/postgresql/extension/*"] # empty
+    (share/"postgresql/extension").install Dir["stage/**/share/postgresql@12.4/extension/*"] # /postgresql?
     pkgshare.install Dir["stage/**/contrib/postgis-*/*"]
     (share/"postgis_topology").install Dir["stage/**/contrib/postgis_topology-*/*"]
+
+    # pg_formula_share = Formula["postgresql@12.4"].opt_share/"postgresql@12.4/extension/"
+    # (Formula["postgresql@12.4"].opt_share/"postgresql@12.4/extension").install Dir["stage/**/share/postgresql@12.4/extension/postgi*.control"]
+    # (Formula["postgresql@12.4"].opt_share/"postgresql@12.4/extension").install Dir["stage/**/share/postgresql@12.4/extension/postgi*.sql"]
+    # system "cp", "stage/usr/local/opt/postgresql@12.4/share/postgresql@12.4/extension/postgis.control", pg_formula_share.to_s
+    # FileUtils.cp Dir[(share/"postgresql/extension/postgis*.control")], pg_formula_share
+    #
+    # NOTE does a mv operation not permitted? Tried Formula#install, system cp, FileUtils. By hand works:
+    #
+    # The control file is used to manage in pg if an extension is enabled or not
+    # cp /usr/local/opt/postgis@3.0.2/share/postgresql/extension/postgi*.control /usr/local/opt/postgresql@12.4/share/postgresql@12.4/extension/
+    # cp /usr/local/opt/postgis@3.0.2/share/postgresql/extension/postgi*.sql /usr/local/opt/postgresql@12.4/share/postgresql@12.4/extension/
+    # The lib files is used when are actually trying to access the extension functionality
+    # cp /usr/local/opt/postgis@3.0.2/lib/postgresql/* /usr/local/opt/postgresql@12.4/lib/postgresql/
 
     # Extension scripts
     bin.install %w[
